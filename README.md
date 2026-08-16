@@ -10,7 +10,7 @@ link opens. Press it uppercase and the link is copied instead.
 From GitHub:
 
 ```
-herdr plugin install <owner>/<repo>
+herdr plugin install ultrakorne/herdr-link-hints
 ```
 
 Or from a local checkout:
