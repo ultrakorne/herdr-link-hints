@@ -1,0 +1,25 @@
+id = "linkhints"
+name = "Link Hints"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "EasyMotion-style keyboard hints for opening links in the focused pane"
+platforms = ["linux", "macos"]
+
+# Bound to a key in ~/.config/herdr/config.toml as:
+#   [[keys.command]]
+#   key = "prefix+u"
+#   type = "plugin_action"
+#   command = "linkhints.toggle"
+# Invoking it once opens the overlay; invoking it again closes it.
+[[actions]]
+id = "toggle"
+title = "Toggle link hints"
+contexts = ["workspace"]
+command = ["python3", "bin/toggle.py"]
+
+# The overlay redraws the source pane verbatim and paints hint labels on top.
+[[panes]]
+id = "hints"
+title = "links"
+placement = "overlay"
+command = ["python3", "bin/hints.py"]
