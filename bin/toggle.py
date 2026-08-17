@@ -9,6 +9,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 
 HERDR = os.environ.get("HERDR_BIN_PATH") or "herdr"
 STATE_DIR = os.environ.get("HERDR_PLUGIN_STATE_DIR") or "/tmp"
@@ -77,7 +78,20 @@ def clear_state():
 
 
 def close_overlay(pane_id):
-    run([HERDR, "plugin", "pane", "close", pane_id])
+    """Dismiss the overlay by asking it to quit, not by closing its pane.
+
+    herdr restores the pre-overlay focus and zoom when the overlay's process
+    exits, and only while the overlay is still focused. `plugin pane close`
+    strips the pane from the layout before that event lands, so the restore is
+    skipped and focus ends up on a positional neighbour. esc is what hints.py
+    already treats as dismiss. Wait for it to go so a fast second press cannot
+    race a new overlay against the old one's exit.
+    """
+    run([HERDR, "pane", "send-keys", pane_id, "esc"])
+    for _ in range(50):
+        if not pane_exists(pane_id):
+            break
+        time.sleep(0.01)
     clear_state()
 
 

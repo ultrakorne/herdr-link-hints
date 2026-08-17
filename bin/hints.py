@@ -22,7 +22,6 @@ IS_MAC = sys.platform == "darwin"
 
 HERDR = os.environ.get("HERDR_BIN_PATH") or "herdr"
 SOURCE_PANE = os.environ.get("LINKHINTS_SOURCE_PANE") or ""
-SELF_PANE = os.environ.get("HERDR_PANE_ID") or ""
 STATE_DIR = os.environ.get("HERDR_PLUGIN_STATE_DIR") or ""
 
 # Home row first, so the common case is the least finger travel.
@@ -178,14 +177,16 @@ def clear_state():
 
 
 def close_self():
+    """Restore the terminal and let the process exit; exiting *is* the close.
+
+    herdr only puts the pre-overlay focus and zoom back when the overlay's own
+    process dies, and only while the overlay is still the focused pane. Closing
+    the pane from in here with `plugin pane close` removes it from the layout
+    first, so that restore is skipped and focus lands on a positional neighbour.
+    """
     clear_state()
     sys.stdout.write("\x1b[?7h\x1b[?25h\x1b[0m")
     sys.stdout.flush()
-    if SELF_PANE:
-        subprocess.run(
-            [HERDR, "plugin", "pane", "close", SELF_PANE],
-            capture_output=True,
-        )
 
 
 def read_key(fd):
